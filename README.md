@@ -4,7 +4,7 @@ A new mi Flutter application.
 
 ## 图例
 
-<div align="center"><img alt="" src="https://github.com/j787701730/mi_flutter/blob/master/home.png" width="280"> <img alt="" src="https://github.com/j787701730/mi_flutter/blob/master/class.png" width="280"> 
+<div align="center"><img alt="" src="https://github.com/j787701730/mi_flutter/blob/master/home.png" width="280"> <img alt="" src="https://github.com/j787701730/mi_flutter/blob/master/class.png" width="280">  <img alt="" src="https://github.com/j787701730/mi_flutter/blob/master/find.png" width="280">
 
 ## Getting Started
 
