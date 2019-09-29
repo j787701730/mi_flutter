@@ -1,3 +1,6 @@
+import 'dart:core';
+import 'dart:core' as prefix0;
+
 import 'package:flutter/material.dart';
 import './data/class-data.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,15 +10,21 @@ class Class extends StatefulWidget {
   _ClassState createState() => _ClassState();
 }
 
-class _ClassState extends State<Class> with SingleTickerProviderStateMixin {
+class _ClassState extends State<Class> {
   PageController _pageController;
-  TabController controller;
+  ScrollController controller;
   int tabIndex = 0;
+
+  double _itemHeight = 70;
+  double allHeight = 0;
+
+  GlobalKey leftMenuKey = GlobalKey();
 
   @override
   void initState() {
+    controller = ScrollController();
     super.initState();
-    controller = TabController(initialIndex: 0, length: data.length, vsync: this);
+    allHeight = _itemHeight * data.length;
     _pageController = PageController();
   }
 
@@ -26,13 +35,28 @@ class _ClassState extends State<Class> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
+  _jump(index) {
+    double height = leftMenuKey.currentContext.size.height;
+    if (controller.offset + height < (index + 1) * _itemHeight ||
+        controller.offset >= index * _itemHeight) {
+      if (allHeight - index * _itemHeight > height) {
+        controller.animateTo(index * _itemHeight,
+            duration: new Duration(microseconds: 200), curve: Curves.ease);
+      } else {
+        controller.animateTo(allHeight - height,
+            duration: new Duration(microseconds: 200), curve: Curves.ease);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
+//    double width = MediaQuery.of(context).size.width;
+//    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('发现'),
+        title: Text('分类'),
 //        titleSpacing: 0,
         actions: <Widget>[
           Container(
@@ -54,8 +78,10 @@ class _ClassState extends State<Class> with SingleTickerProviderStateMixin {
 //          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Container(
+              key: leftMenuKey,
               width: 100,
               child: ListView(
+                controller: controller,
                 children: data.map<Widget>((item) {
                   int index = data.indexOf(item);
                   return GestureDetector(
@@ -66,49 +92,31 @@ class _ClassState extends State<Class> with SingleTickerProviderStateMixin {
                       _pageController.jumpToPage(index);
                     },
                     child: Container(
-                        padding: EdgeInsets.only(top: 15, bottom: 15),
-                        child: Container(
-                          padding: EdgeInsets.only(left: 10),
-                          decoration: BoxDecoration(
-                              border: Border(
-                                  left: BorderSide(
-                            width: 3,
-                            color: tabIndex == index ? Color(0xffED5B00) : Colors.transparent,
-                          ))),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              '${item['category_name']}',
-                              style: TextStyle(
-                                color: tabIndex == index ? Color(0xffED5B00) : Color(0xff1E1E1E),
+                        height: _itemHeight,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            height: _itemHeight / 2,
+                            padding: EdgeInsets.only(left: 10),
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    left: BorderSide(
+                              width: 3,
+                              color: tabIndex == index ? Color(0xffED5B00) : Colors.transparent,
+                            ))),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                '${item['category_name']}',
+                                style: TextStyle(
+                                  color: tabIndex == index ? Color(0xffED5B00) : Color(0xff1E1E1E),
+                                ),
                               ),
                             ),
                           ),
                         )),
                   );
                 }).toList(),
-//                children: <Widget>[
-//                  TabBar(
-//                    controller: controller,
-//                    isScrollable: false,
-//                    labelPadding: EdgeInsets.zero,
-//                    indicatorPadding: EdgeInsets.only(left: 8, right: 8),
-//                    labelColor: Color(0xffED5B00),
-//                    unselectedLabelColor: Color(0xff1E1E1E),
-//                    indicatorColor: Color(0xffED5B00),
-//                    tabs: data.map<Tab>((item) {
-//                      return Tab(
-//                        text: '${item['category_name']}',
-//                      );
-//                    }).toList(),
-//                    onTap: (index) {
-//                      setState(() {
-//                        tabIndex = index;
-//                      });
-//                      _pageController.jumpToPage(index); // 与PageView的互动
-//                    },
-//                  )
-//                ],
               ),
             ),
             Expanded(
@@ -123,8 +131,8 @@ class _ClassState extends State<Class> with SingleTickerProviderStateMixin {
                   onPageChanged: (index) {
                     setState(() {
                       tabIndex = index;
+                      _jump(index);
                     });
-                    controller.animateTo(index); // 与TabBar的互动
                   },
                 ))
           ],
@@ -143,7 +151,10 @@ class Com extends StatefulWidget {
   _ComState createState() => _ComState();
 }
 
-class _ComState extends State<Com> {
+class _ComState extends State<Com> with AutomaticKeepAliveClientMixin {
+  @override
+  get wantKeepAlive => true;
+
   ScrollController _controller = ScrollController();
   bool scro = true;
 
@@ -157,15 +168,19 @@ class _ComState extends State<Com> {
   }
 
   @override
+  void didUpdateWidget(Com oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    setState(() {
+      scro = true;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     double width = MediaQuery.of(context).size.width;
     return GestureDetector(
-      onHorizontalDragStart: (xx) {
-        setState(() {
-          scro = true;
-        });
-      },
-      onHorizontalDragDown: (DragDownDetails xxx) {
+      onHorizontalDragDown: (xxx) {
         if (_controller.offset < 0 ||
             _controller.position.pixels > _controller.position.maxScrollExtent) {
           setState(() {
@@ -177,6 +192,7 @@ class _ComState extends State<Com> {
         controller: _controller,
         shrinkWrap: true,
         physics: scro ? ScrollPhysics() : NeverScrollableScrollPhysics(),
+//        physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.only(right: 10),
         children: <Widget>[
           Column(
