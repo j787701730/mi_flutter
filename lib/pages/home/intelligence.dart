@@ -5,43 +5,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-import '../data/home-data0.dart';
+import '../data/home-data-intelligence.dart';
 
-class Recommend extends StatefulWidget {
+class Intelligence extends StatefulWidget {
   @override
-  _RecommendState createState() => _RecommendState();
+  _IntelligenceState createState() => _IntelligenceState();
 }
 
-class _RecommendState extends State<Recommend> {
+class _IntelligenceState extends State<Intelligence> {
   RefreshController _refreshController = RefreshController(initialRefresh: false);
 
   void _onRefresh() async {
     // monitor network fetch
-//    _getRecommend();
+//    _getIntelligence();
     _refreshController.refreshCompleted();
-  }
-
-  void _onLoading() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-
-    if (mounted) setState(() {});
-    _refreshController.loadComplete();
   }
 
   @override
   void initState() {
     super.initState();
-//    _getRecommend();
+//    _getIntelligence();
   }
 
-  _getRecommend() async {
-    Response response = await Dio().post("http://api.m.mi.com/v1/home/Recommend", data: {
+  _getIntelligence() async {
+    Response response = await Dio().post("http://api.m.mi.com/v1/home/Intelligence", data: {
       'page_id': 0,
-      'phone_type': 'SM-G9350',
+      'Intelligence_type': 'SM-G9350',
       'tab_index': 0,
       'page_index': 1,
-      'phone_name':
+      'Intelligence_name':
           '1Od7ut7j9rYCOsgZFe9C6MBTzn%2FtRKo8gk94m4Afn9917kiB6RvdY0i9s%2B9eIWHxNy%2FKvmFGaj%2FQOTB0eOsUxGgAB5QJF%2BnK5PbGSnee5wg%3D'
     });
     if (mounted) {
@@ -51,13 +43,15 @@ class _RecommendState extends State<Recommend> {
     }
   }
 
-  _two(data, width) {
+  _moreRow(data, width) {
     return Wrap(
-      spacing: 10,
+      spacing: 4,
       children: data.map<Widget>((item) {
         return Container(
-          width: (width - 30) / 2,
+          padding: EdgeInsets.only(bottom: 15),
+          width: (width - 4 * data.length) / data.length,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               CachedNetworkImage(
                 imageUrl:
@@ -66,23 +60,21 @@ class _RecommendState extends State<Recommend> {
                 errorWidget: (context, url, error) => Icon(Icons.error),
               ),
               Container(
-                height: 10,
-              ),
-              Text(
-                '${item['product_name']}',
-                style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                '${item['product_brief']}',
-                style: TextStyle(
-                  color: Colors.black,
+                padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+                child: Text(
+                  '${item['product_name']}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
                 ),
               ),
               Container(
-//                                padding: EdgeInsets.only(top: 8),
+                padding: EdgeInsets.only(left: 10, top: 4),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,22 +96,6 @@ class _RecommendState extends State<Recommend> {
                   ],
                 ),
               ),
-              Container(
-                width: width / 4,
-                child: InkWell(
-                    onTap: () {},
-                    child: Container(
-                      padding: EdgeInsets.only(top: 6, bottom: 6),
-                      child: Center(
-                        child: Text(
-                          '立即购买',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    )),
-                color: Color(0xffEA625B),
-                padding: EdgeInsets.all(0),
-              )
             ],
           ),
         );
@@ -133,31 +109,9 @@ class _RecommendState extends State<Recommend> {
     return Container(
       child: SmartRefresher(
         enablePullDown: true,
-        enablePullUp: true,
         header: WaterDropHeader(),
-        footer: CustomFooter(
-          builder: (BuildContext context, LoadStatus mode) {
-            Widget body;
-            if (mode == LoadStatus.idle) {
-              body = Text("pull up load");
-            } else if (mode == LoadStatus.loading) {
-              body = CupertinoActivityIndicator();
-            } else if (mode == LoadStatus.failed) {
-              body = Text("Load Failed!Click retry!");
-            } else if (mode == LoadStatus.canLoading) {
-              body = Text("release to load more");
-            } else {
-              body = Text("No more Data");
-            }
-            return Container(
-              height: 55.0,
-              child: Center(child: body),
-            );
-          },
-        ),
         controller: _refreshController,
         onRefresh: _onRefresh,
-        onLoading: _onLoading,
         child: data.isEmpty
             ? Container(
                 child: Center(
@@ -170,15 +124,20 @@ class _RecommendState extends State<Recommend> {
                     children: data['sections'].map<Widget>((item) {
                       Widget com = Container();
                       switch (item['view_type']) {
-                        case 'gallery_540':
+                        case 'gallery_custom':
                           com = Container(
-                            height: width * 540 / 1080,
+                            height: width *
+                                double.tryParse('${item['body']['h']}') /
+                                double.tryParse('${item['body']['w']}'),
                             child: Swiper(
                               autoplay: true,
                               itemBuilder: (BuildContext context, int index) {
-                                return new Image.network(
-                                  "${item['body']['items'][index]['img_url_webp']}",
-                                  fit: BoxFit.fill,
+                                Map li = item['body']['items'][index];
+                                return CachedNetworkImage(
+                                  imageUrl:
+                                      '${li['img_url_webp'] == null ? li['img_url'] : li['img_url_webp']}',
+                                  placeholder: (context, url) => Icon(Icons.image),
+                                  errorWidget: (context, url, error) => Icon(Icons.error),
                                 );
                               },
                               itemCount: item['body']['items'].length,
@@ -281,98 +240,67 @@ class _RecommendState extends State<Recommend> {
                                 '0xff${int.tryParse('${item['body']['line_color'].substring(1)}', radix: 16).toRadixString(16).toUpperCase()}')),
                           );
                           break;
-                        case 'list_new_red_packet':
-                        case 'list_eco_pub_1':
+                        case 'list_three_type2':
+                        case 'list_three_type4':
+                          com = _moreRow(item['body']['items'], width);
+                          break;
+                        case 'list_one_type14':
                           com = Column(
                             children: item['body']['items'].map<Widget>((li) {
-                              return Container(
-                                width: width / item['body']['items'].length,
-                                child: CachedNetworkImage(
-                                  imageUrl:
-                                      '${li['img_url_webp'] == null ? li['img_url'] : li['img_url_webp']}',
-                                  placeholder: (context, url) => Icon(Icons.image),
-                                  errorWidget: (context, url, error) => Icon(Icons.error),
-                                ),
-                              );
-                            }).toList(),
-                          );
-                          break;
-                        case 'list_seckill':
-                          com = Column(
-                            children: <Widget>[
-                              Container(
-                                height: width * 120 / 1080,
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: NetworkImage(
-                                            '${data['sections'][9]['body']['img_url_webp']}'))),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: <Widget>[
-                                    Text(
-                                      '${data['sections'][9]['body']['title_desc']}',
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
+                              return Column(
+                                children: <Widget>[
+                                  Container(
+                                    width: width / item['body']['items'].length,
+                                    child: CachedNetworkImage(
+                                      imageUrl:
+                                          '${li['img_url_webp'] == null ? li['img_url'] : li['img_url_webp']}',
+                                      placeholder: (context, url) => Icon(Icons.image),
+                                      errorWidget: (context, url, error) => Icon(Icons.error),
                                     ),
-                                    Container(
-                                      width: 10,
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.only(left: 2, right: 2),
-                                      color: Color(0xff505050),
-                                      child: Text(
-                                        '01',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    Text(':'),
-                                    Container(
-                                      padding: EdgeInsets.only(left: 2, right: 2),
-                                      color: Color(0xff505050),
-                                      child: Text(
-                                        '01',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    Text(':'),
-                                    Container(
-                                      padding: EdgeInsets.only(left: 2, right: 2),
-                                      color: Color(0xff505050),
-                                      child: Text(
-                                        '01',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 10,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                height: 200,
-                                color: Colors.white,
-                                child: ListView(
-                                  padding: EdgeInsets.only(
-                                    left: 10,
                                   ),
-                                  scrollDirection: Axis.horizontal,
-                                  children: item['body']['items'].map<Widget>((li) {
-                                    return Container(
-                                      margin: EdgeInsets.only(right: 10),
-                                      child: Column(
+                                  Container(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Container(
+                                              padding: EdgeInsets.only(left: 15),
+                                              child: Text(
+                                                '${li['product_name']}',
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(left: 15),
+                                              child: Text(
+                                                '${li['product_brief']}',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
                                         children: <Widget>[
                                           Container(
-                                            width: 160,
-                                            height: 160,
-                                            child: Image.network('${li['img_url']}'),
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.only(top: 8),
+                                            padding: EdgeInsets.only(left: 10, top: 4, right: 15),
                                             child: Row(
                                               crossAxisAlignment: CrossAxisAlignment.end,
+                                              mainAxisAlignment: MainAxisAlignment.start,
                                               children: <Widget>[
                                                 Row(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,65 +308,43 @@ class _RecommendState extends State<Recommend> {
                                                     Text(
                                                       '￥',
                                                       style: TextStyle(
-                                                          color: Color(0xffED5B00), fontSize: 10),
+                                                          color: Color(0xffEA625B), fontSize: 10),
                                                     ),
                                                     Text(
                                                       '${li['product_price']}',
                                                       style: TextStyle(
-                                                          color: Color(0xffED5B00), fontSize: 16),
+                                                          color: Color(0xffEA625B), fontSize: 16),
                                                     ),
                                                   ],
                                                 ),
-                                                Text(
-                                                  '￥${li['product_org_price']}',
-                                                  style: TextStyle(
-                                                      decorationStyle: TextDecorationStyle.solid,
-                                                      decoration: TextDecoration.lineThrough,
-                                                      decorationColor: Color(0xffAAAAAA),
-                                                      color: Color(0xffAAAAAA),
-                                                      fontSize: 10),
-                                                ),
                                               ],
                                             ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(right: 15),
+                                            width: 100,
+                                            child: InkWell(
+                                                onTap: () {},
+                                                child: Container(
+                                                  padding: EdgeInsets.only(top: 6, bottom: 6),
+                                                  child: Center(
+                                                    child: Text(
+                                                      '立即购买',
+                                                      style: TextStyle(color: Colors.white),
+                                                    ),
+                                                  ),
+                                                )),
+                                            color: Color(0xffEA625B),
+                                            padding: EdgeInsets.all(0),
                                           )
                                         ],
                                       ),
-                                    );
-                                  }).toList(),
-                                ),
-                              )
-                            ],
-                          );
-                          break;
-                        case 'list_two_type13':
-                        case 'list_two_type1':
-                          com = Container(
-                            color: Colors.white,
-                            padding: EdgeInsets.all(10),
-                            child: _two(item['body']['items'], width),
-                          );
-                          break;
-                        case 'list_action_title':
-                          com = Column(
-                            children: item['body']['items'].map<Widget>((li) {
-                              return Container(
-                                color: Colors.white,
-                                padding: EdgeInsets.all(10),
-                                child: Center(
-                                  child: Text('${li['action_title']} > '),
-                                ),
-                              );
-                            }).toList(),
-                          );
-                          break;
-                        case 'list_one_video3':
-                          com = Column(
-                            children: item['body']['items'].map<Widget>((li) {
-                              return CachedNetworkImage(
-                                imageUrl:
-                                    '${li['img_url_webp'] == null ? li['img_url'] : li['img_url_webp']}',
-                                placeholder: (context, url) => Icon(Icons.image),
-                                errorWidget: (context, url, error) => Icon(Icons.error),
+                                    ],
+                                  ),
+                                  Container(
+                                    height: 10,
+                                  ),
+                                ],
                               );
                             }).toList(),
                           );
