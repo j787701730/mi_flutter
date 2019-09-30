@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mi_flutter/pages/home/recommend.dart';
 import 'package:mi_flutter/pages/home/intelligence.dart';
+import 'package:mi_flutter/pages/home/phone.dart';
+import 'package:mi_flutter/pages/home/recommend.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -86,7 +87,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   PageController _pageController;
   var tabView = [
     Recommend(),
-    Container(),
+    Phone(),
     Intelligence(),
     Container(),
     Container(),
