@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:mi_flutter/pages/goods-detail.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../data/home-data0.dart';
@@ -174,6 +175,12 @@ class _RecommendState extends State<Recommend> {
                           com = Container(
                             height: width * 540 / 1080,
                             child: Swiper(
+                              onTap: (index) {
+                                Navigator.push(
+                                  context,
+                                  new MaterialPageRoute(builder: (context) => new GoodsDetail()),
+                                );
+                              },
                               autoplay: true,
                               itemBuilder: (BuildContext context, int index) {
                                 return new Image.network(
