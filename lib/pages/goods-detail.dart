@@ -155,7 +155,7 @@ class _GoodsDetailState extends State<GoodsDetail> {
                         style: TextStyle(color: Color(0xffff4a00))),
                     TextSpan(
                         text:
-                            '5G双卡全网通超高速网络 / 骁龙855Plus旗舰处理器 / 40W有线闪充+30W无线闪充+10W无线反充，4000mAh长续航 / 4800万全焦段三摄 / 超振感横向线性马达 / VC液冷散热 / 高色准三星AMOLED屏幕 / 多功能NFC',
+                            '5G双卡全网通超高速网络 / 骁龙855Plus旗舰处理器 / 40W有线闪充+30W无线闪充+10W无线反充，4000mAh长续航 / 4800万全焦段三摄 / 超振感横向线性马达 / VC液冷散热 / 高色准三星AMOLED屏幕 / 多功能NFC / 赠送小米云服务1TB云存储',
                         style: TextStyle(color: Color(0xff7B7B7B)))
                   ])),
                 ),
