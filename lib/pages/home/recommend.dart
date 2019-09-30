@@ -236,6 +236,26 @@ class _RecommendState extends State<Recommend> {
                                 ],
                               ),
                             );
+                          } else if (item['body']['items'].length == 2) {
+                            com = Row(
+                              children: item['body']['items'].map<Widget>((li) {
+                                int index = item['body']['items'].indexOf(li);
+                                return Container(
+                                  color: Colors.white,
+                                  padding: EdgeInsets.only(
+                                    left: index == 0 ? 0 : 4,
+                                    right: index == 0 ? 4 : 0,
+                                  ),
+                                  width: width / item['body']['items'].length,
+                                  child: CachedNetworkImage(
+                                    imageUrl:
+                                        '${li['img_url_webp'] == null ? li['img_url'] : li['img_url_webp']}',
+                                    placeholder: (context, url) => Icon(Icons.image),
+                                    errorWidget: (context, url, error) => Icon(Icons.error),
+                                  ),
+                                );
+                              }).toList(),
+                            );
                           } else {
                             com = Column(
                               children: item['body']['items'].map<Widget>((li) {
