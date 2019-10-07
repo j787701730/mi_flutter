@@ -15,7 +15,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MI Flutter',
-      theme: ThemeData(primaryColor: Colors.white, platform: TargetPlatform.iOS),
+      theme:
+          ThemeData(primaryColor: Colors.white, platform: TargetPlatform.iOS),
       debugShowCheckedModeBanner: false,
       home: MyHomePage(),
     );
@@ -52,7 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
       top: 0,
       child: Container(
         decoration: BoxDecoration(
-            color: Colors.transparent, borderRadius: BorderRadius.all(Radius.circular(20))),
+            color: Colors.transparent,
+            borderRadius: BorderRadius.all(Radius.circular(20))),
         width: size,
         height: size,
         child: Center(
@@ -86,7 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
           itemCount: nav.length,
           itemBuilder: (context, index) => nav[index]),
       bottomNavigationBar: Theme(
-          data: ThemeData(splashFactory: NoSplashFactory(), highlightColor: Color(0xffff)),
+          data: ThemeData(
+              splashFactory: NoSplashFactory(), highlightColor: Color(0xffff)),
           child: Container(
             color: Colors.white,
             height: 50,
