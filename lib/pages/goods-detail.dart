@@ -9,6 +9,295 @@ class GoodsDetail extends StatefulWidget {
 }
 
 class _GoodsDetailState extends State<GoodsDetail> {
+  Map instalment = {};
+  int instalmentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    instalment = data['goods_info'][0]['instalment'];
+  }
+
+  instalmentWidget(width, context) {
+    return instalment.isEmpty
+        ? Container()
+        : Container(
+            padding: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 10),
+            child: Row(
+              children: <Widget>[
+                Text('分期'),
+                Container(
+                  width: 10,
+                ),
+                Expanded(
+                    flex: 1,
+                    child: GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                            backgroundColor: Colors.transparent,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(builder: (context1, state) {
+                                return Container(
+                                  height: 400,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                        height: 100,
+                                        child: Stack(
+                                          children: <Widget>[
+                                            Positioned(
+                                                top: 10,
+                                                child: Container(
+                                                  color: Colors.white,
+                                                  width: width,
+                                                  height: 90,
+                                                  child: Container(
+                                                    padding: EdgeInsets.only(
+                                                      left: 110,
+                                                      top: 10
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: <Widget>[
+                                                        Row(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: <Widget>[
+                                                            Text(
+                                                              '￥',
+                                                              style: TextStyle(color:Color(0xffFE5C43), fontSize: 16),
+                                                            ),
+                                                            Text(
+                                                              '3799',
+                                                              style: TextStyle(color: Color(0xffFE5C43), fontSize: 22),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Container(
+                                                          child: Text('小米9 Pro 5G 8GB+256GB 钛银黑'),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )),
+                                            Positioned(
+                                                left: 10,
+                                                top: 0,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Color(0xffD5D5D5), width: 1),
+                                                      borderRadius:
+                                                          BorderRadius.all(Radius.circular(3))),
+                                                  child: CachedNetworkImage(
+                                                    width: 90,
+                                                    height: 90,
+                                                    fit: BoxFit.fitWidth,
+                                                    imageUrl:
+                                                        'https://cdn.cnbj0.fds.api.mi-img.com/b2c-shopapi-pms/pms_1569242567.71764421.jpg?w=720&h=721&thumb=1',
+                                                    placeholder: (context, url) =>
+                                                        Icon(Icons.image),
+                                                    errorWidget: (context, url, error) =>
+                                                        Icon(Icons.error),
+                                                  ),
+                                                )),
+                                            Positioned(
+                                              right: 10,
+                                              top: 20,
+                                              child: GestureDetector(
+                                                onTap: (){
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Icon(Icons.close,color: Color(0xffA5A5A5),),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        color: Colors.white,
+                                        width: width,
+                                        height: 40,
+                                        child: Container(
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: instalment['list'].map<Widget>((item) {
+                                              int index = instalment['list'].indexOf(item);
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  state(() {
+                                                    instalmentIndex = index;
+                                                  });
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.all(6),
+                                                  width: width / 2 - 20,
+                                                  decoration: BoxDecoration(
+                                                      color: instalmentIndex == index
+                                                          ? Color(0xffF2F2F2)
+                                                          : Colors.white,
+                                                      border: Border.all(
+                                                          color: Color(0xffD5D5D5), width: 1)),
+                                                  child: Center(
+                                                    child: Text(
+                                                      '${item['title']}',
+                                                      style: TextStyle(
+                                                        color: instalmentIndex == index
+                                                            ? Color(0xffFE5C43)
+                                                            : Colors.black,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        height: 220,
+                                        color: Colors.white,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: instalment['list'].map<Widget>((item) {
+                                            int index = instalment['list'].indexOf(item);
+                                            return Offstage(
+                                              offstage: instalmentIndex != index,
+                                              child: Container(
+                                                width: width,
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: item['detail'].map<Widget>((detail) {
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        Map temp = instalment;
+                                                        for (int idx = 0;
+                                                            idx <
+                                                                temp['list'][index]['detail']
+                                                                    .length;
+                                                            idx++) {
+                                                          if (idx ==
+                                                              item['detail'].indexOf(detail)) {
+                                                            temp['list'][index]['detail'][idx]
+                                                                ['checked'] = true;
+                                                          } else {
+                                                            temp['list'][index]['detail'][idx]
+                                                                ['checked'] = false;
+                                                          }
+                                                        }
+                                                        state(() {
+                                                          instalment = temp;
+                                                        });
+                                                      },
+                                                      child: Container(
+                                                        width: width,
+                                                        height: 70,
+                                                        padding:
+                                                            EdgeInsets.only(left: 15, right: 15),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment.spaceBetween,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment.center,
+                                                          children: <Widget>[
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment.start,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment.center,
+                                                              children: <Widget>[
+                                                                Text(
+                                                                  '${detail['stage_cost']}元X${detail['stage']}期',
+                                                                  style: TextStyle(
+                                                                      color:
+                                                                          detail['checked'] == true
+                                                                              ? Color(0xffFF6F33)
+                                                                              : Colors.black),
+                                                                ),
+                                                                Text(
+                                                                  '手续费 ${detail['stage_interest']}元/期',
+                                                                  style: TextStyle(
+                                                                      color:
+                                                                          detail['checked'] == true
+                                                                              ? Color(0xffFF6F33)
+                                                                              : Colors.black),
+                                                                )
+                                                              ],
+                                                            ),
+                                                            Container(
+                                                              width: 18,
+                                                              height: 18,
+                                                              decoration: BoxDecoration(
+                                                                  border: Border.all(
+                                                                      color: Color(0xffEDEDED),
+                                                                      width: 1),
+                                                                  borderRadius: BorderRadius.all(
+                                                                      Radius.circular(18))),
+                                                              child: Center(
+                                                                child: Container(
+                                                                  width: 12,
+                                                                  height: 12,
+                                                                  decoration: BoxDecoration(
+                                                                      color:
+                                                                          detail['checked'] == true
+                                                                              ? Color(0xffFF6F33)
+                                                                              : Colors.white,
+                                                                      borderRadius:
+                                                                          BorderRadius.all(
+                                                                              Radius.circular(18))),
+                                                                ),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList(),
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                      Container(
+                                        color: Color(0xffFF6F33),
+                                        height: 40,
+                                        width: width,
+                                        child: Center(
+                                          child: Text(
+                                            '到货通知',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              });
+                            });
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Row(
+                            children:
+                                data['goods_info'][0]['instalment']['list'].map<Widget>((item) {
+                              return Container(
+                                child: Text(
+                                    '${item['title']}${data['goods_info'][0]['instalment']['list'].indexOf(item) < data['goods_info'][0]['instalment']['list'].length - 1 ? '/' : ''}'),
+                              );
+                            }).toList(),
+                          ),
+                          Icon(Icons.keyboard_arrow_right)
+                        ],
+                      ),
+                    ))
+              ],
+            ),
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -163,10 +452,17 @@ class _GoodsDetailState extends State<GoodsDetail> {
                   height: 1,
                   color: Color(0xffEEEEEE),
                   margin: EdgeInsets.only(left: 15, right: 15),
-                )
+                ),
+                // 分期
+                instalmentWidget(width, context),
+                Container(
+                  height: 10,
+                  color: Color(0xffEEEEEE),
+                ),
               ],
             ),
           ),
+          // 底部菜单栏
           Positioned(
               left: 0,
               bottom: 0,
